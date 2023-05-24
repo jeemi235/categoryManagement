@@ -1,0 +1,97 @@
+package cache
+
+import (
+	"categorymanagement/models"
+	"encoding/json"
+	"log"
+	"net/http"
+	"time"
+	"github.com/patrickmn/go-cache"
+)
+
+const (
+	defaultExpiration = 1 * time.Minute
+	purgeTime         = 1 * time.Minute
+)
+
+type allCache struct {
+	products *cache.Cache
+}
+
+var c = newCache()
+
+// func checkCache(f httprouter.Handle) httprouter.Handle {
+// 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+// 		id := "1"
+// 		res, ok := c.read(id)
+// 		if ok {
+// 			w.Header().Set("Content-Type", "application/json")
+// 			w.Write(res)
+// 			return
+// 		}
+// 		log.Println("From Controller")
+// 		f(w, r, p)
+// 	}
+// }
+
+func CheckCache(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := "1"
+		res, ok := c.read(id)
+		if ok {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(res)
+			return
+		}
+		log.Println("From Controller")
+		handler.ServeHTTP(w, r)
+	})
+}
+
+func newCache() *allCache {
+	Cache := cache.New(defaultExpiration, purgeTime)
+	return &allCache{
+		products: Cache,
+	}
+}
+
+func (c *allCache) read(id string) (item []byte, ok bool) {
+	data, ok := c.products.Get(id)
+	if ok {
+		log.Println("from cache")
+		res, err := json.Marshal(data)
+		if err != nil {
+			log.Fatal("Error")
+		}
+		return res, true
+	}
+	return nil, false
+}
+
+func UpdateCache(id string, data []models.Types){
+	c.Update(id,data)
+}
+
+func (c *allCache) Update(id string, data []models.Types) {
+	c.products.Set(id, data, cache.DefaultExpiration)
+}
+
+func main(){
+r.With(cache.CheckCache).Get("/get", handlers.GetCategories)
+}
+	
+
+func GetCategories(w http.ResponseWriter, r *http.Request) {
+	id := "1"
+	name := r.URL.Query().Get("name")
+	db := r.Context().Value("database").(*sql.DB)
+
+	data, err := bll.GetCategories(db, name)
+	if err != nil {
+		// e.HandleError(w, err)
+		return
+	}
+	cache.UpdateCache(id, data)
+	middlewares.ResponseWithJsonPayload(w, data)
+}
+   

@@ -1,0 +1,53 @@
+create table if not exists users(id int8 primary key default unique_rowid(),
+name string not null,
+unique(name));
+
+insert
+	into
+	users(name)
+values('jeemi')
+;
+
+select * from users;
+
+create type typ as enum('object',
+'material',
+'texture',
+'mep');
+
+show enums;
+drop type typess;
+
+CREATE TABLE IF NOT EXISTS category (
+    id INT8 PRIMARY KEY DEFAULT unique_rowid(),
+    type typ NOT NULL,
+    name STRING(30) NOT NULL,
+    parent_id INT NULL,
+    icon STRING NOT NULL,
+    user_id INT8 NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE NULL,
+    CONSTRAINT categories_self_parent_prevention_check CHECK (parent_id != id), 
+    UNIQUE INDEX uc_categories_name_parent_id (name ASC, parent_id ASC),
+    INDEX idx_categories_parent_id (parent_id ASC),
+    CONSTRAINT fk_categories_parent_id FOREIGN KEY (parent_id) REFERENCES category (id),
+    CONSTRAINT fk_categories_user_id FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+insert
+	into
+	category (type,
+	name,
+	parent_id,
+	icon,
+	user_id,
+	created_at)
+values('object',
+'charger',
+863613352676491265,
+'c.jpg',
+863611762007769089,
+'1970-01-01 00:00:01');
+
+select * from category;
+

@@ -1,0 +1,117 @@
+[
+	type1{
+		parentid1{
+					{
+						category_id
+						name
+						icon
+						userid
+						createdat
+					}
+				}
+		parentid2{
+					{
+						category_id
+						name
+						icon
+						userid
+						createdat
+					}
+				}
+		}
+		type2{
+		parentid1{
+					{
+						category_id
+						name
+						icon
+						userid
+						createdat
+					}
+				}
+		parentid2{
+					{
+						category_id
+						name
+						icon
+						userid
+						createdat
+					}
+				}
+		}
+]
+type Types struct {
+	Type string `json:"type"`
+	ParentCategory ParentCategory
+}
+
+type ParentCategory struct {
+	ParentID   int        `json:"parentid"`
+	Categories []SubCategory `json:"categories"`
+}
+
+type SubCategory struct {
+	CategoryID int    `json:"category_id"`
+	Name       string `json:"name"`
+	Icon       string `json:"icon"`
+	UserID     int    `json:"userid"`
+	CreatedAt  string `json:"createdat"`
+	UpdatedAt  string `json:"updatedat"`
+}
+
+
+
+
+
+
+
+func GetCategories(w http.ResponseWriter, r *http.Request) {
+	db := r.Context().Value("database").(*sql.DB)
+
+	data, err := bll.GetCategories(db)
+	if err != nil {
+		e.HandleError(w,err)
+		return
+	}
+	middlewares.ResponseWithJsonPayload(w, data)
+}
+
+
+func GetCategories(db *sql.DB) ([]models.Categories, error) {
+	data, err := dal.GetCategories(db)
+	
+	//fmt.Println(data)
+	return data, err
+}
+
+
+func GetCategories(db *sql.DB) ([]models.Categories, error) {
+	sqlQuery := `select id,type,name,icon,user_id,created_at from category`
+
+	rows, err := db.Query(
+		sqlQuery,
+	)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	categories := []models.Categories{}
+	for rows.Next() {
+		var category models.Categories
+		if err := rows.Scan(&category.Id, &category.Type, &category.Name, &category.Icon, &category.UserId, &category.CreatedAt); err != nil {
+			log.Println(err)
+			return []models.Categories{}, err
+		}
+		categories = append(categories, category)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println(err)
+		return []models.Categories{}, err
+	}
+
+	return categories, err
+}
+
+
