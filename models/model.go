@@ -10,16 +10,6 @@ type Categories struct {
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`
 }
-
-type Categorie struct {
-	Id        int    `json:"id"`
-	Type      string `json:"type"`
-	Name      string `json:"name"`
-	Icon      string `json:"icon"`
-	UserId    int    `json:"userId"`
-	CreatedAt string `json:"createdAt"`
-}
-
 type Types struct {
 	Type           string `json:"type"`
 	ParentCategory ParentCategory

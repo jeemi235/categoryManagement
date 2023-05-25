@@ -10,8 +10,6 @@ import (
 
 func Routes(r *chi.Mux) {
 
-	//.With(middlewares.Authuser)
-
 	r.With(middlewares.DbContext).With(middlewares.Authuser).Route("/categories", func(r chi.Router) {
 		r.Post("/add", handlers.AddCategory)
 		r.Put("/update", handlers.UpdateCategory)

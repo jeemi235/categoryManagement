@@ -53,7 +53,7 @@ func UpdateCategory(w http.ResponseWriter, r *http.Request) {
 
 	err = bll.UpdateCategory(db, newType, newName)
 	if err != nil {
-		//e.ErrorResponseGenerator(w, err)
+		e.ErrorGenerator(w, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -77,6 +77,7 @@ func DeleteCategory(w http.ResponseWriter, r *http.Request) {
 		e.ErrorGenerator(w, err)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Data deleted successfully"))
 }
 
@@ -98,6 +99,7 @@ func GetCategories(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//If we are calling api for the first time will add data in the cache
 	cache.UpdateCache(id, data)
 	
 	middlewares.ResponseWithJsonPayload(w, data)

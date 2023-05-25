@@ -118,6 +118,7 @@ func (e *Error) ErrorResponseGenerator(w http.ResponseWriter, errCode int, errMs
 
 }
 
+//This function will print error in response in format  
 func (e Error) WriteError(w http.ResponseWriter, errorCode int, err string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(errorCode)
